@@ -1,0 +1,29 @@
+---
+- name: Add user information to devx database
+  hosts: all
+  become: yes
+
+  vars:
+    db_name: devx
+    db_user: devops
+    db_pass: mypassword
+
+  tasks:
+    - name: Get user information
+      command: id your_username
+      register: user_info
+
+    - name: Add user information to database
+      mysql_db:
+        name: "{{ db_name }}"
+        login_user: "{{ db_user }}"
+        login_password: "{{ db_pass }}"
+        state: present
+        login_host: localhost
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+        target: users
+        data:
+          username: khan
+          uid: "{{ user_info.stdout.split('(')[1].split(')')[0] }}"
+          gid: "{{ user_info.stdout.split('=')[2].split('(')[0] }}"
+          homedir: "{{ lookup('env', 'HOME') }}/{{ your_username }}"

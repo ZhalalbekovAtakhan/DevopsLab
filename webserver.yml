@@ -1,0 +1,14 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: Install Apache Web Server
+      apt:
+        name: apache2
+        state: present
+        update_cache: yes
+
+    - name: Copy index.html
+      copy:
+        content: "Hello world from {{ ansible_host }}"
+        dest: /var/www/html/index.html
